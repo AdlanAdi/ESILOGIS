@@ -1,0 +1,10 @@
+{
+  "/page": "app/page.js",
+  "/(auth)/login/page": "app/(auth)/login/page.js",
+  "/(main)/admin/dashboard/page": "app/(main)/admin/dashboard/page.js",
+  "/(main)/admin/reported-issues/page": "app/(main)/admin/reported-issues/page.js",
+  "/(main)/admin/preventive-interventions/page": "app/(main)/admin/preventive-interventions/page.js",
+  "/(main)/admin/technical-staff/page": "app/(main)/admin/technical-staff/page.js",
+  "/(main)/admin/equipments/equipement-types/page": "app/(main)/admin/equipments/equipement-types/page.js",
+  "/(main)/technician/workOrders/page": "app/(main)/technician/workOrders/page.js"
+}
