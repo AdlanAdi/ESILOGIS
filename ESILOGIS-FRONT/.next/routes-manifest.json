@@ -1,0 +1,310 @@
+{
+  "version": 3,
+  "pages404": true,
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [],
+  "dynamicRoutes": [
+    {
+      "page": "/admin/preventive-interventions/edit/[id]",
+      "regex": "^/admin/preventive\\-interventions/edit/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/admin/preventive\\-interventions/edit/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/admin/preventive-interventions/show-details/[id]",
+      "regex": "^/admin/preventive\\-interventions/show\\-details/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/admin/preventive\\-interventions/show\\-details/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/admin/reported-issues/report-details/[id]",
+      "regex": "^/admin/reported\\-issues/report\\-details/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/admin/reported\\-issues/report\\-details/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/admin/reported-issues/report-details-edit/[id]",
+      "regex": "^/admin/reported\\-issues/report\\-details\\-edit/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/admin/reported\\-issues/report\\-details\\-edit/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/technician/report-details/[id]",
+      "regex": "^/technician/report\\-details/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/technician/report\\-details/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/technician/work-order-details/[id]",
+      "regex": "^/technician/work\\-order\\-details/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/technician/work\\-order\\-details/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/technician/worker-details/[id]",
+      "regex": "^/technician/worker\\-details/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/technician/worker\\-details/(?<nxtPid>[^/]+?)(?:/)?$"
+    }
+  ],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/about",
+      "regex": "^/about(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/about(?:/)?$"
+    },
+    {
+      "page": "/admin/dashboard",
+      "regex": "^/admin/dashboard(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/dashboard(?:/)?$"
+    },
+    {
+      "page": "/admin/departments",
+      "regex": "^/admin/departments(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/departments(?:/)?$"
+    },
+    {
+      "page": "/admin/equipments",
+      "regex": "^/admin/equipments(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/equipments(?:/)?$"
+    },
+    {
+      "page": "/admin/equipments/add-equipment",
+      "regex": "^/admin/equipments/add\\-equipment(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/equipments/add\\-equipment(?:/)?$"
+    },
+    {
+      "page": "/admin/equipments/edit-equipment",
+      "regex": "^/admin/equipments/edit\\-equipment(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/equipments/edit\\-equipment(?:/)?$"
+    },
+    {
+      "page": "/admin/equipments/equipement-types",
+      "regex": "^/admin/equipments/equipement\\-types(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/equipments/equipement\\-types(?:/)?$"
+    },
+    {
+      "page": "/admin/equipments/equipment-details",
+      "regex": "^/admin/equipments/equipment\\-details(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/equipments/equipment\\-details(?:/)?$"
+    },
+    {
+      "page": "/admin/files",
+      "regex": "^/admin/files(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/files(?:/)?$"
+    },
+    {
+      "page": "/admin/locations",
+      "regex": "^/admin/locations(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/locations(?:/)?$"
+    },
+    {
+      "page": "/admin/notifications",
+      "regex": "^/admin/notifications(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/notifications(?:/)?$"
+    },
+    {
+      "page": "/admin/preventive-interventions",
+      "regex": "^/admin/preventive\\-interventions(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/preventive\\-interventions(?:/)?$"
+    },
+    {
+      "page": "/admin/preventive-interventions/add-task",
+      "regex": "^/admin/preventive\\-interventions/add\\-task(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/preventive\\-interventions/add\\-task(?:/)?$"
+    },
+    {
+      "page": "/admin/reported-issues",
+      "regex": "^/admin/reported\\-issues(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/reported\\-issues(?:/)?$"
+    },
+    {
+      "page": "/admin/reported-issues/assigne-intervention",
+      "regex": "^/admin/reported\\-issues/assigne\\-intervention(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/reported\\-issues/assigne\\-intervention(?:/)?$"
+    },
+    {
+      "page": "/admin/reported-issues/report-issue",
+      "regex": "^/admin/reported\\-issues/report\\-issue(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/reported\\-issues/report\\-issue(?:/)?$"
+    },
+    {
+      "page": "/admin/technical-staff",
+      "regex": "^/admin/technical\\-staff(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/technical\\-staff(?:/)?$"
+    },
+    {
+      "page": "/admin/technical-staff/EditWorker",
+      "regex": "^/admin/technical\\-staff/EditWorker(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/technical\\-staff/EditWorker(?:/)?$"
+    },
+    {
+      "page": "/admin/technical-staff/add-technical-staff",
+      "regex": "^/admin/technical\\-staff/add\\-technical\\-staff(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/technical\\-staff/add\\-technical\\-staff(?:/)?$"
+    },
+    {
+      "page": "/admin/technical-staff/add-worker",
+      "regex": "^/admin/technical\\-staff/add\\-worker(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/technical\\-staff/add\\-worker(?:/)?$"
+    },
+    {
+      "page": "/admin/technical-staff/edit-worker-details",
+      "regex": "^/admin/technical\\-staff/edit\\-worker\\-details(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/technical\\-staff/edit\\-worker\\-details(?:/)?$"
+    },
+    {
+      "page": "/admin/technical-staff/worker-details",
+      "regex": "^/admin/technical\\-staff/worker\\-details(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/technical\\-staff/worker\\-details(?:/)?$"
+    },
+    {
+      "page": "/admin/users",
+      "regex": "^/admin/users(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/users(?:/)?$"
+    },
+    {
+      "page": "/forgot-password",
+      "regex": "^/forgot\\-password(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/forgot\\-password(?:/)?$"
+    },
+    {
+      "page": "/login",
+      "regex": "^/login(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/login(?:/)?$"
+    },
+    {
+      "page": "/profile",
+      "regex": "^/profile(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/profile(?:/)?$"
+    },
+    {
+      "page": "/reset-password",
+      "regex": "^/reset\\-password(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/reset\\-password(?:/)?$"
+    },
+    {
+      "page": "/technician/Dashboard",
+      "regex": "^/technician/Dashboard(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/technician/Dashboard(?:/)?$"
+    },
+    {
+      "page": "/technician/notifications",
+      "regex": "^/technician/notifications(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/technician/notifications(?:/)?$"
+    },
+    {
+      "page": "/technician/report-issue-technician",
+      "regex": "^/technician/report\\-issue\\-technician(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/technician/report\\-issue\\-technician(?:/)?$"
+    },
+    {
+      "page": "/technician/technical-staff",
+      "regex": "^/technician/technical\\-staff(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/technician/technical\\-staff(?:/)?$"
+    },
+    {
+      "page": "/technician/workOrders",
+      "regex": "^/technician/workOrders(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/technician/workOrders(?:/)?$"
+    },
+    {
+      "page": "/user/ReportIntervention",
+      "regex": "^/user/ReportIntervention(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/user/ReportIntervention(?:/)?$"
+    },
+    {
+      "page": "/user/home",
+      "regex": "^/user/home(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/user/home(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "RSC",
+    "varyHeader": "RSC, Next-Router-State-Tree, Next-Router-Prefetch, Next-Router-Segment-Prefetch",
+    "prefetchHeader": "Next-Router-Prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSuffix": ".prefetch.rsc",
+    "prefetchSegmentHeader": "Next-Router-Segment-Prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments"
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  },
+  "rewrites": []
+}
