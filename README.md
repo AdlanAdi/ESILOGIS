@@ -40,6 +40,6 @@ Users can report facility-related problems within the school:
 
 - **Frontend:** React / Next.js / Tailwind CSS  
 - **Backend:** Node.js / Express.js  
-- **Database:** PostgreSQL / MongoDB (or your choice)  
+- **Database:** PostgreSQL / Neon
 - **Authentication:** JWT / Session-based Auth  
 - **Deployment:** Not deployed yet !! 
