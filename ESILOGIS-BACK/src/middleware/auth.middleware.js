@@ -1,7 +1,5 @@
 // src/middleware/auth.middleware.js - Authentication middleware
 const jwt = require("jsonwebtoken");
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
 const logger = require("../utils/logger");
 
 // Generate JWT token

@@ -1,5 +1,5 @@
-const { PrismaClient, Role } = require("@prisma/client");
-const prisma = new PrismaClient();
+const { Role } = require("@prisma/client");
+const prisma = require("../../lib/prisma");
 const logger = require("../../utils/logger");
 const bcrypt = require("bcrypt");
 

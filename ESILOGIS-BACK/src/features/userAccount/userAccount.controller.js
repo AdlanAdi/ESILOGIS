@@ -1,6 +1,5 @@
 const logger = require("../../utils/logger");
-const { PrismaClient , userAccount} = require("@prisma/client");
-const prisma = new PrismaClient();
+const prisma = require("../../lib/prisma");
 async function getAllUserAccounts(req, res) {
     try {
         const userAccounts = await prisma.userAccount.findMany({

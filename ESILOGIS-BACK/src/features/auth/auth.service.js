@@ -1,12 +1,12 @@
 // src/features/auth/auth.service.js
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { PrismaClient, Role } = require("@prisma/client");
+const { Role } = require("@prisma/client");
 const logger = require("../../utils/logger");
 const { sendEmail } = require("../notifications/notifications.service");
 const nodemailer = require("nodemailer");
 
-const prisma = new PrismaClient();
+const prisma = require("../../lib/prisma");
 
 // Register a new user
 async function registerUser({ email, password, role }) {

@@ -1,13 +1,12 @@
 // src/features/interventions/intervention.service.js
 const {
-    PrismaClient,
     InterventionStatus,
     InterventionType,
     InterventionPriority,
     EquipmentStatus,
     Role,
 } = require("@prisma/client");
-const prisma = new PrismaClient();
+const prisma = require("../../lib/prisma");
 const logger = require("../../utils/logger");
 const {
     sendNotificationToAdmins,

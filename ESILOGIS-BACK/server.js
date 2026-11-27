@@ -1,9 +1,8 @@
 // server.js - Application entry point
 require("dotenv").config();
 const app = require("./app");
-const { PrismaClient } = require("@prisma/client");
 const logger = require("./src/utils/logger");
-const prisma = new PrismaClient();
+const prisma = require("./src/lib/prisma");
 
 const PORT = process.env.PORT || 3000;
 
