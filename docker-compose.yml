@@ -4,8 +4,10 @@ services:
   backend:
     build:
       context: ./ESILOGIS-BACK
-      dockerfile: Dockerfile
+      dockerfile: dockerfile
     container_name: esilogis-back
+    # Tiny init as PID 1: reaps zombies and forwards signals to the app.
+    init: true
     restart: unless-stopped
     ports:
       - "3001:3001"
@@ -14,8 +16,9 @@ services:
   frontend:
     build:
       context: ./ESILOGIS-FRONT
-      dockerfile: Dockerfile
+      dockerfile: dockerfile
     container_name: esilogis-front
+    init: true
     restart: unless-stopped
     ports:
       - "3000:3000"

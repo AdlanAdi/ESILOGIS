@@ -4,8 +4,9 @@ services:
   backend:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: dockerfile
     container_name: esilogis-front-test
+    init: true
     ports:
       - "3000:3000"
     restart: unless-stopped

@@ -5,4 +5,9 @@ RUN npm install
 COPY . .   
 RUN npx prisma generate
 EXPOSE 3001 
-CMD ["npm", "run" , "dev"]
+
+# Run node directly so it is PID 1 and receives `docker stop`'s SIGTERM itself.
+# `npm run dev` would put npm -> nodemon -> node between Docker and the
+# graceful-shutdown handler in server.js, so emailQueue.drain() would never run
+# and queued emails would be lost on every redeploy.
+CMD ["node", "server.js"]
