@@ -10,8 +10,8 @@ const prisma = require("../../lib/prisma");
 const logger = require("../../utils/logger");
 const {
     sendNotificationToAdmins,
+    notifyTechnicianAssigned,
 } = require("../notifications/notifications.service");
-const { sendNotificationToTechnician } = require("../notifications/notifications.service");
 
 // Get all interventions
 // Update getAllInterventions function
@@ -368,6 +368,11 @@ async function assignIntervention(interventionIds, technicianIds, adminUserId) {
                 in: technicianIds.map((id) => parseInt(id)),
             },
         },
+        include: {
+            userAccount: {
+                select: { id: true, email: true },
+            },
+        },
     });
 
     if (persons.length !== technicianIds.length) {
@@ -419,8 +424,6 @@ async function assignIntervention(interventionIds, technicianIds, adminUserId) {
                         personId: parseInt(personId),
                     },
                 });
-                // we send them a notification as well
-                await sendNotificationToTechnician(personId, intervention.location.name, intervention.description);
             }
 
             // Get the complete intervention with assignments
@@ -440,6 +443,19 @@ async function assignIntervention(interventionIds, technicianIds, adminUserId) {
         });
 
         results.push(result);
+
+        // Notify assignees only after the transaction has committed: the DB
+        // notification write is a single round trip and the email is queued,
+        // so nothing here can block or roll back the assignment.
+        try {
+            for (const person of persons) {
+                await notifyTechnicianAssigned(person, result);
+            }
+        } catch (error) {
+            logger.error(
+                `Failed to notify assignees for intervention ${interventionId}: ${error.message}`
+            );
+        }
 
         // Add history entries for each assignment
         for (const person of persons) {

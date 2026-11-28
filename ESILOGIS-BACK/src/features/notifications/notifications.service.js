@@ -2,22 +2,59 @@ const logger = require("../../utils/logger");
 const { Role } = require("@prisma/client");
 const prisma = require("../../lib/prisma");
 const nodemailer = require("nodemailer");
+const { emailQueue } = require("../../lib/job-queue");
 
-async function createNotification(recepientId, message) {
+// One pooled SMTP transport for the whole process. Building a transporter per
+// email forces a new TCP + TLS handshake with Gmail every time.
+let transporter = null;
+
+function emailConfigured() {
+    return Boolean(process.env.EMAIL_USER && process.env.EMAIL_PASS);
+}
+
+function getTransporter() {
+    if (!transporter) {
+        transporter = nodemailer.createTransport({
+            service: "gmail",
+            pool: true,
+            maxConnections: 2,
+            maxMessages: 50,
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS,
+            },
+        });
+    }
+    return transporter;
+}
+
+// SMTP 5xx replies (bad credentials, blocked sender) are permanent: retrying
+// them just hammers the provider and delays every queued email behind them.
+async function sendMailNow(transporter, mailOptions) {
     try {
-        const notification = {
-            recepientId,
-            message,
-            createdAt: new Date(),
-            isRead: false,
-        };
+        return await transporter.sendMail(mailOptions);
+    } catch (error) {
+        if (typeof error.responseCode === "number" && error.responseCode >= 500) {
+            error.permanent = true;
+        }
+        throw error;
+    }
+}
 
+async function createNotification(userId, message) {
+    try {
+        // Schema fields are `userId` and `read`; the previous version used
+        // `recepientId`/`isRead`, which Prisma rejects at runtime.
         const newNotification = await prisma.notification.create({
-            data: notification,
+            data: {
+                userId: parseInt(userId, 10),
+                message,
+                read: false,
+            },
         });
         return newNotification;
     } catch (error) {
-        logger.error("Error creating notification", error);
+        logger.error(`Error creating notification: ${error.message}`);
         throw new Error("Error creating notification");
     }
 }
@@ -50,23 +87,18 @@ async function sendNotificationToAdmins(message, interventionData = {}) {
         });
 
         // Check if email credentials are set
-        if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+        if (!emailConfigured()) {
             logger.warn("Email credentials not configured");
             return {
                 success: true,
+                emailQueued: false,
                 message:
                     "Notifications saved but emails not sent due to missing configuration",
             };
         }
 
-        // Configure transporter
-        const transporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
-            },
-        });
+        // Shared pooled transporter
+        const transporter = getTransporter();
 
         // Get admin emails
         const adminEmails = admins.map((admin) => admin.email);
@@ -226,55 +258,83 @@ Cordialement,
 ESI LOGIS`,
         };
 
-        try {
-            const info = await transporter.sendMail(mailOptions);
-            logger.info(`Email sent: ${info.messageId}`);
-            return { success: true };
-        } catch (error) {
-            logger.error("Error sending email", error);
-            return {
-                success: false,
-                message: "Error sending email, but notifications were saved",
-            };
-        }
+        // Queue the SMTP send and return immediately. The notification rows are
+        // already committed, so the caller never waits on Gmail and no
+        // transaction or pooled connection stays open while SMTP is slow.
+        const queued = emailQueue.add("admin-problem-notification", async () => {
+            const info = await sendMailNow(transporter, mailOptions);
+            logger.info(`Email sent to admins: ${info.messageId}`);
+        });
+
+        return {
+            success: true,
+            emailQueued: queued,
+            message: queued
+                ? "Notifications saved, email queued"
+                : "Notifications saved, email queue is full",
+        };
     } catch (error) {
         logger.error("Error sending notification", error);
         throw new Error(`Error sending notification: ${error.message}`);
     }
 }
 
-async function sendNotificationToTechnician(techEmail, location, description, message) {
+// Notify one technician that a work order was assigned to them.
+// `person` is a Person row including its optional userAccount. The previous
+// signature took a `techEmail` that callers passed a numeric person id into,
+// and the body referenced an undefined `admin`, so it threw inside the
+// assignment transaction and rolled the whole assignment back.
+async function notifyTechnicianAssigned(person, intervention = {}, message) {
     try {
-        // Create notifications in the database
-        const notificationsData = {
-            userId: admin.id,
-            message,
-            createdAt: new Date(),
-            read: false,
+        const interventionData = {
+            location: intervention.location?.name,
+            description: intervention.description,
         };
 
-        await prisma.notification.createMany({
-            data: notificationsData,
-        });
+        const body =
+            message ||
+            `New work order assigned: ${interventionData.description || ""}${
+                interventionData.location
+                    ? ` at ${interventionData.location}`
+                    : ""
+            }`;
 
-        // Check if email credentials are set
-        if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+        // DB notification (one round trip) for technicians that have an account
+        if (person.userAccountId) {
+            await prisma.notification.create({
+                data: {
+                    userId: person.userAccountId,
+                    message: body,
+                    read: false,
+                },
+            });
+        }
+
+        const techEmail = person.userAccount?.email || person.email;
+
+        if (!emailConfigured()) {
             logger.warn("Email credentials not configured");
             return {
                 success: true,
+                emailQueued: false,
                 message:
                     "Notifications saved but emails not sent due to missing configuration",
             };
         }
 
-        // Configure transporter
-        const transporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
-            },
-        });
+        if (!techEmail) {
+            logger.warn(
+                `Technician ${person.id} has no email address; skipping assignment email`
+            );
+            return {
+                success: true,
+                emailQueued: false,
+                message: "No email address for technician",
+            };
+        }
+
+        // Shared pooled transporter
+        const transporter = getTransporter();
 
         // Create HTML email with replaced placeholders
         const htmlEmail = `<!DOCTYPE html>
@@ -415,7 +475,7 @@ async function sendNotificationToTechnician(techEmail, location, description, me
         const mailOptions = {
             from: process.env.EMAIL_USER,
             bcc: techEmail,
-            subject: "Nouvel signalement",
+            subject: "Nouvel ordre de travail",
             html: htmlEmail,
             // Include plain text alternative for email clients that don't support HTML
             text: `Bonjour,
@@ -429,17 +489,24 @@ Cordialement,
 ESI LOGIS`,
         };
 
-        try {
-            const info = await transporter.sendMail(mailOptions);
-            logger.info(`Email sent: ${info.messageId}`);
-            return { success: true };
-        } catch (error) {
-            logger.error("Error sending email", error);
-            return {
-                success: false,
-                message: "Error sending email, but notifications were saved",
-            };
-        }
+        // Queue the SMTP send; the caller does not wait for Gmail.
+        const queued = emailQueue.add(
+            `technician-assignment-${person.id}`,
+            async () => {
+                const info = await sendMailNow(transporter, mailOptions);
+                logger.info(
+                    `Assignment email sent to ${techEmail}: ${info.messageId}`
+                );
+            }
+        );
+
+        return {
+            success: true,
+            emailQueued: queued,
+            message: queued
+                ? "Notification saved, email queued"
+                : "Notification saved, email queue is full",
+        };
     } catch (error) {
         logger.error("Error sending notification", error);
         throw new Error(`Error sending notification: ${error.message}`);
@@ -449,5 +516,10 @@ ESI LOGIS`,
 module.exports = {
     createNotification,
     sendNotificationToAdmins,
-    sendNotificationToTechnician,
+    notifyTechnicianAssigned,
+    // Kept for backwards compatibility with older call sites.
+    sendNotificationToTechnician: notifyTechnicianAssigned,
+    getTransporter,
+    sendMailNow,
+    emailConfigured,
 };

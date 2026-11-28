@@ -3,8 +3,12 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { Role } = require("@prisma/client");
 const logger = require("../../utils/logger");
-const { sendEmail } = require("../notifications/notifications.service");
-const nodemailer = require("nodemailer");
+const {
+    getTransporter,
+    sendMailNow,
+    emailConfigured,
+} = require("../notifications/notifications.service");
+const { emailQueue } = require("../../lib/job-queue");
 
 const prisma = require("../../lib/prisma");
 
@@ -83,14 +87,6 @@ async function generateResetToken(email) {
         throw new Error("User not found");
     }
 
-    const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-        },
-    });
-
     // Create simple JWT with user ID and timestamp to make tokens unique
     const resetToken = jwt.sign(
         {
@@ -104,17 +100,28 @@ async function generateResetToken(email) {
 
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
 
-    // Send the reset email
-    await transporter.sendMail({
-        from: process.env.EMAIL_USER,
-        to: email,
-        subject: "Password Reset Request",
-        template: "password-reset",
-        text: `Click the link to reset your password: ${resetUrl}`,
+    // Queue the reset email: the request returns immediately even when SMTP is
+    // slow or Gmail is rate-limiting us.
+    if (!emailConfigured()) {
+        logger.warn(
+            `Password reset requested for ${email} but email is not configured`
+        );
+        return { success: true, emailQueued: false };
+    }
+
+    const queued = emailQueue.add("password-reset-email", async () => {
+        const info = await sendMailNow(getTransporter(), {
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: "Password Reset Request",
+            template: "password-reset",
+            text: `Click the link to reset your password: ${resetUrl}`,
+        });
+        logger.info(`Password reset email sent to ${email}: ${info.messageId}`);
     });
 
-    logger.info(`Password reset email sent to: ${email}`);
-    return { success: true };
+    logger.info(`Password reset email queued for: ${email}`);
+    return { success: true, emailQueued: queued };
 }
 
 async function resetPassword(token, newPassword) {
